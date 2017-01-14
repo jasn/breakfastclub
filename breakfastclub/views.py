@@ -1,7 +1,9 @@
 from flask import Flask, render_template, request
+
+
 from breakfastclub import app
 from breakfastclub.models import Person, Session
-import click
+
 
 @app.route('/')
 def index():
@@ -13,23 +15,29 @@ def show_people():
     peeps = session.query(Person.name, Person.email)
     return render_template('people.html', people=peeps)
 
-@app.cli.command('initdb')
-def initdb_command():
-    """Initialize the database."""
-    # TODO: fix this. Should be placed somewhere else.
-    #people.Base.metadata.create_all(people.engine)
-    print("Database initialized")
 
 @app.route('/people/add', methods=['POST', 'GET'])
 def add_person():
     if request.method == 'POST':
+        print("Hello")
         name = str(request.form['name'])
         email = str(request.form['email'])
-        person = Person(name=name, email=email)
-        session = people.Session()
+        person = Person(name=name, email=email, active=True)
+        session = Session()
         session.add(person)
         session.commit()
-        return render_template('add_person.html')#, person_added=True)
+        return show_people() # render_template('add_person.html')#, person_added=True)
     else:
         return render_template('add_person.html')#, person_added=False)
 
+
+@app.route('/breadlist')
+def show_breadlist():
+    breadbringers = [{'date': '20-01-2017',
+                      'name': 'Jesper',
+                      'email': 'xyz@cs.au.dk'},
+                     {'date': '27-01-2017',
+                      'name': 'Gerth',
+                      'email': 'abc@cs.au.dk'},]
+
+    return render_template('breadlist.html', breadbringers=breadbringers)
