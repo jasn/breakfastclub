@@ -1,8 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for
 
 from breakfastclub import app, db
-from breakfastclub.models import Person
+from breakfastclub.models import Person, BreadList
 
+from breakfastclub.forms import AddPersonForm
 
 @app.route('/')
 def index():
@@ -16,25 +17,19 @@ def show_people():
 
 @app.route('/people/add', methods=['POST', 'GET'])
 def add_person():
-    if request.method == 'POST':
-        print("Hello")
-        name = str(request.form['name'])
-        email = str(request.form['email'])
+    form = AddPersonForm(request.form)
+    if request.method == 'POST' and form.validate():
+        name = form.name.data
+        email = form.email.data
         person = Person(name=name, email=email, active=True)
         db.session.add(person)
         db.session.commit()
         return redirect(url_for('show_people'))
     else:
-        return render_template('add_person.html')
+        return render_template('add_person.html', form=form)
 
 
 @app.route('/breadlist')
 def show_breadlist():
-    breadbringers = [{'date': '20-01-2017',
-                      'name': 'Jesper',
-                      'email': 'xyz@cs.au.dk'},
-                     {'date': '27-01-2017',
-                      'name': 'Gerth',
-                      'email': 'abc@cs.au.dk'},]
-
-    return render_template('breadlist.html', breadbringers=breadbringers)
+    entries = db.session.query(BreadList).order_by(BreadList.date)
+    return render_template('breadlist.html', breadbringers=entries)

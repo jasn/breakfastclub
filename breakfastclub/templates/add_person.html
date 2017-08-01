@@ -3,9 +3,19 @@
     <title>List of people</title>
   </head>
   <body>
+    {% if form.name.errors %}
+    {% for error in form.name.errors %}
+    Name: {{ error }}<br>
+    {% endfor %}
+    {% endif %}
+    {% if form.email.errors %}
+    {% for error in form.email.errors %}
+    Email: {{ error }}<br>
+    {% endfor %}
+    {% endif %}
     <form action="" method="post" name="form">
-      Name: <input name="name" type="text">
-      Email: <input name="email" type="text">
+      Name: {{ form.name(required=True) }}
+      Email: {{ form.email(required=True) }}
       <input type="submit" value="Add">
   </body>
 </html>
