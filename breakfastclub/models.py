@@ -2,9 +2,11 @@ import click
 import datetime
 from random import shuffle
 
+from flask_login import UserMixin
+
 from breakfastclub import app, db, migrate
 
-class Person(db.Model):
+class Person(db.Model, UserMixin):
     __tablename__ = 'person'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -13,9 +15,9 @@ class Person(db.Model):
     active = db.Column(db.Boolean, default=True, nullable=False)
     token = db.Column(db.String(128))
     is_admin = db.Column(db.Boolean, default=False, nullable=False)
+
     def __repr__(self):
         return '<Person(name=%s, email=%s)>' % (self.name, self.email)
-
 
 class BreadList(db.Model):
     __tablename__ = 'breadlist'
@@ -34,7 +36,7 @@ def generate_breadlist(day):
     """
     Generates a new breadlist.
     """
-    active_people = db.query(Person).filter_by(active=True).all()
+    active_people = db.session.query(Person).filter_by(active=True).all()
     shuffle(active_people)
     today = datetime.date.today()
 

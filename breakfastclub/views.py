@@ -1,9 +1,10 @@
 from flask import Flask, render_template, request, redirect, url_for
+from flask_login import login_user, login_required
 
 from breakfastclub import app, db
 from breakfastclub.models import Person, BreadList
 
-from breakfastclub.forms import AddPersonForm
+from breakfastclub.forms import AddPersonForm, ShowLoginForm
 
 @app.route('/')
 def index():
@@ -14,6 +15,18 @@ def show_people():
     people = db.session.query(Person.name, Person.email)
     return render_template('people.html', people=people)
 
+@app.route('/login/success')
+@login_required
+def show_successful_login():
+    return render_template('login_successful.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def show_login():
+    form = ShowLoginForm(request.form)
+    if request.method == 'POST' and form.validate():
+        login_user(form.person)
+        return redirect(url_for('show_successful_login'))
+    return render_template('login.html', form=form)
 
 @app.route('/people/add', methods=['POST', 'GET'])
 def add_person():

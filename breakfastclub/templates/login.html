@@ -1,0 +1,15 @@
+<html>
+  <head>
+    <title>Login Page</title>
+  </head>
+  <body>
+    {% if form.token.errors %}
+    {% for error in form.token.errors %}
+    Token: {{ error }}<br>
+    {% endfor %}
+    {% endif %}
+    <form action="" method="post" name="form">
+      Token: {{ form.token(required=True) }}
+      <input type="submit" value="Login">
+  </body>
+</html>

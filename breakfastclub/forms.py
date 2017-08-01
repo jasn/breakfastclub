@@ -2,6 +2,8 @@ from wtforms import Form, StringField, validators, widgets
 from wtforms.widgets.html5 import EmailInput
 from breakfastclub.models import Person
 
+from breakfastclub import db
+
 class AddPersonForm(Form):
 
     name = StringField(
@@ -17,3 +19,17 @@ class AddPersonForm(Form):
         widget=EmailInput(),
     )
 
+class ShowLoginForm(Form):
+    token = StringField('token', [validators.InputRequired()])
+
+    def validate(self):
+        if not super().validate():
+            return False
+        token = self.token.data
+        person = db.session.query(Person).filter_by(token=token).first()
+        if person is None:
+            self.token.errors.append('Invalid token.')
+            return False
+
+        self.person = person
+        return True

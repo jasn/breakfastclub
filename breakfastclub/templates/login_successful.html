@@ -1,0 +1,11 @@
+<html>
+  <head>
+    <title>Login Success!</title>
+  </head>
+  <body>
+    {% if current_user.is_authenticated %}
+    Hi {{ current_user.name }}!<br>
+    Congratulations! You are now logged in!
+    {% endif %}
+  </body>
+</html>
