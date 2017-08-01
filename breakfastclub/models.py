@@ -8,9 +8,11 @@ class Person(db.Model):
     __tablename__ = 'person'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100))
-    email = db.Column(db.String(191))  # varchar max length utf8mb4
-    active = db.Column(db.Boolean)
+    name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(191), nullable=False)  # varchar max length utf8mb4
+    active = db.Column(db.Boolean, default=True, nullable=False)
+    token = db.Column(db.String(128))
+    is_admin = db.Column(db.Boolean, default=False, nullable=False)
     def __repr__(self):
         return '<Person(name=%s, email=%s)>' % (self.name, self.email)
 
@@ -19,8 +21,10 @@ class BreadList(db.Model):
     __tablename__ = 'breadlist'
 
     id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.Date)
-    person_id = db.Column(db.Integer, db.ForeignKey(Person.id))
+    date = db.Column(db.Date, nullable=False)
+    person_id = db.Column(db.Integer,
+                          db.ForeignKey(Person.id, name='fk_breadlist_person_id'),
+                          nullable=False)
 
 
 @app.cli.command('generate-breadlist')
