@@ -1,55 +1,26 @@
+import click
 import datetime
 from random import shuffle
 
-from sqlalchemy import create_engine, Column, Integer, String, Date, Boolean
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy import ForeignKey
-from sqlalchemy import func
+from breakfastclub import app, db, migrate
 
-import click
+class Person(db.Model):
+    __tablename__ = 'person'
 
-from breakfastclub import app
-
-engine = create_engine('mysql+mysqlconnector://breakfast:monster@localhost/breakfastclub')
-Base = declarative_base()
-Session = sessionmaker(bind=engine)
-
-class Person(Base):
-    __tablename__ = 'people'
-
-    person_id = Column(Integer, primary_key=True)
-    name = Column(String(100))
-    email = Column(String(200))
-    active = Column(Boolean)
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100))
+    email = db.Column(db.String(191))  # varchar max length utf8mb4
+    active = db.Column(db.Boolean)
     def __repr__(self):
         return '<Person(name=%s, email=%s)>' % (self.name, self.email)
 
 
-class breadlists(Base):
-    __tablename__ = 'breadlists'
+class BreadList(db.Model):
+    __tablename__ = 'breadlist'
 
-    id = Column(Integer, primary_key=True)
-
-
-class bread_bringer(Base):
-    __tablename__ = 'breadbringer'
-
-    entry_id = Column(Integer, primary_key=True)
-    breadlist_id = Column(Integer, ForeignKey('breadlists.id'))
-    person_id = Column(Integer, ForeignKey('people.person_id'))
-    date = Column(Date)
-
-    def __repr__(self):
-        return '<BreadlistEntry(person_id=%s, date=%s)>' % (self.person_id,
-                                                            self.date)
-
-
-@app.cli.command('initdb')
-def initdb_command():
-    """Initialize the database."""
-    Base.metadata.create_all(engine)
-    print("Database initialized")
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.Date)
+    person_id = db.Column(db.Integer, db.ForeignKey(Person.id))
 
 
 @app.cli.command('generate-breadlist')
@@ -59,8 +30,7 @@ def generate_breadlist(day):
     """
     Generates a new breadlist.
     """
-    session = Session()
-    active_people = session.query(Person).filter_by(active=True).all()
+    active_people = db.query(Person).filter_by(active=True).all()
     shuffle(active_people)
     today = datetime.date.today()
 
