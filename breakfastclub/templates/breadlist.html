@@ -1,12 +1,16 @@
-<html>
-  <head>
-    <title>Breadlist</title>
-  </head>
-  <body>
-    <ul>
-    {% for x in breadbringers %}
-    <li>{{ x }}</li>
-    {% endfor %}
-    </ul>
-  </body>
-</html>
+<table>
+  <tr>
+    <th>Navn</th>
+    <th>Dato</th>
+  </tr>
+  {% for breadbringer in breadbringers %}
+  {% if breadbringer.is_next %}
+  <tr class="next_bringer">
+    {% else %}
+  <tr class="bringer">
+  {% endif %}
+    <td>{{ breadbringer.person.name }}  {{ breadbringer.id }}</td>
+    <td>{{ breadbringer.date }}</td>
+  </tr>
+  {% endfor %}
+</table>
