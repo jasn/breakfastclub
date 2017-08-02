@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for
 from flask_login import login_user, login_required
 
-from breakfastclub import app, db
+from breakfastclub import app, db, login_manager
 from breakfastclub.models import Person, BreadList
 
 from breakfastclub.forms import AddPersonForm, ShowLoginForm
@@ -25,8 +25,11 @@ def show_login():
     form = ShowLoginForm(request.form)
     if request.method == 'POST' and form.validate():
         login_user(form.person)
-        return redirect(url_for('show_successful_login'))
+        flash('Login successful.')
+        return redirect(url_for('index'))
     return render_template('login.html', form=form)
+login_manager.login_view = 'show_login'
+
 
 @app.route('/people/add', methods=['POST', 'GET'])
 def add_person():

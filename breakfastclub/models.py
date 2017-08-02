@@ -2,9 +2,9 @@ import click
 import datetime
 from random import shuffle
 
-from flask_login import UserMixin
+from flask_login import UserMixin, AnonymousUserMixin
 
-from breakfastclub import app, db, migrate
+from breakfastclub import app, db, migrate, login_manager
 
 class Person(db.Model, UserMixin):
     __tablename__ = 'person'
