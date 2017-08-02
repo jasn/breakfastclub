@@ -15,6 +15,7 @@ csrf = CSRFProtect(app)
 
 from . import models
 from . import views
+from . import admin
 
 @login_manager.user_loader
 def load_user(person_id):
