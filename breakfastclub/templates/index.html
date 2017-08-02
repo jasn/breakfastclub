@@ -1,7 +1,7 @@
 {% extends "master.html" %}
 
 {% block body %}
-<h1>Welcome to the index page of the Breakfastclub</h1>
+<h1>Welcome to the Breakfastclub</h1>
 {% include 'breadlist.html' %}
 {% if current_user.is_admin %}
 <a href="/admin/">Admin Page</a> <a href="{{ url_for('show_generate_breadlist') }}">Generate Breadlist</a>
