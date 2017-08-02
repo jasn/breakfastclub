@@ -1,0 +1,34 @@
+{% extends "master.html" %}
+
+{% block body %}
+{% if form.data.errors %}
+{{ form.data.errors }}
+{% endif %}
+<form method="post"> {{ form.csrf_token }}
+  {{ form.data }}
+<table>
+  <tr>
+    <th>Navn</th>
+    <th>Dato</th>
+  </tr>
+  {% for bringer in form.new_bringers %}
+  <tr>
+    <td>{{ bringer.person.name }}</td>
+    <td>{{ bringer.date }}</td>
+  </tr>
+  {% endfor %}
+  <tr><td colspan=2><hr></td></tr>
+  {% for breadbringer in breadbringers %}
+  {% if breadbringer.is_next %}
+  <tr class="next_bringer">
+    {% else %}
+  <tr class="bringer">
+  {% endif %}
+    <td>{{ breadbringer.person.name }}  {{ breadbringer.id }}</td>
+    <td>{{ breadbringer.date }}</td>
+  </tr>
+  {% endfor %}
+</table>
+<input type="submit" value="Create">
+</form>
+{% endblock %}

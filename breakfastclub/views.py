@@ -6,7 +6,7 @@ from flask_login import login_user, login_required
 from breakfastclub import app, db, login_manager
 from breakfastclub.models import Person, BreadList
 
-from breakfastclub.forms import AddPersonForm, ShowLoginForm
+from breakfastclub.forms import AddPersonForm, ShowLoginForm, GenerateBreadListForm
 
 @app.route('/')
 def index():
@@ -17,6 +17,20 @@ def index():
     next_bringer.is_next = True
     return render_template('index.html', breadbringers=breadlist)
 
+
+@app.route('/generate_breadlist', methods=['GET', 'POST'])
+def show_generate_breadlist():
+    breadlist = list(db.session.query(BreadList).order_by(BreadList.date.desc()))
+    today = datetime.date.today()
+    next_bringer = min((b for b in breadlist if b.date >= today),
+                       key=lambda b: b.date)
+    next_bringer.is_next = True
+    form = GenerateBreadListForm(request.form)
+    if request.method == 'POST' and form.validate():
+        form.save()
+        flash('Generated breadlist saved.')
+        return redirect(url_for('index'))
+    return render_template('generate_breadlist.html', breadbringers=breadlist, form=form)
 
 
 @app.route('/people')
