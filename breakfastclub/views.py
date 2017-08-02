@@ -1,4 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for
+import datetime
+
+from flask import flash, Flask, render_template, request, redirect, url_for
 from flask_login import login_user, login_required
 
 from breakfastclub import app, db, login_manager
@@ -8,17 +10,26 @@ from breakfastclub.forms import AddPersonForm, ShowLoginForm
 
 @app.route('/')
 def index():
-    return "Hello, world!"
+    breadlist = db.session.query(BreadList).order_by(BreadList.date.desc())
+    today = datetime.date.today()
+    next_bringer = min((b for b in breadlist if b.date >= today),
+                       key=lambda b: b.date)
+    next_bringer.is_next = True
+    return render_template('index.html', breadbringers=breadlist)
+
+
 
 @app.route('/people')
 def show_people():
     people = db.session.query(Person.name, Person.email)
     return render_template('people.html', people=people)
 
+
 @app.route('/login/success')
 @login_required
 def show_successful_login():
     return render_template('login_successful.html')
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def show_login():
