@@ -1,10 +1,15 @@
-from wtforms import Form, StringField, validators, widgets
+import json
+import datetime
+from datetime import timedelta
+
+from wtforms import StringField, validators, widgets
+from flask_wtf import FlaskForm
 from wtforms.widgets.html5 import EmailInput
 from breakfastclub.models import Person
 
 from breakfastclub import db
 
-class AddPersonForm(Form):
+class AddPersonForm(FlaskForm):
 
     name = StringField(
         'name',
@@ -19,7 +24,7 @@ class AddPersonForm(Form):
         widget=EmailInput(),
     )
 
-class ShowLoginForm(Form):
+class ShowLoginForm(FlaskForm):
     token = StringField('token', [validators.InputRequired()])
 
     def validate(self):
