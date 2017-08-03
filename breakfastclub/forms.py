@@ -102,12 +102,11 @@ class GenerateBreadListForm(FlaskForm):
         to_add = timedelta(days=7)
         self.new_bringers = []
         for person in people:
-            self.new_bringers.append(BreadList(person=person, person_id=person.id, date=next_tuesday))
+            self.new_bringers.append(dict(person=person, person_id=person.id, date=next_tuesday))
             next_tuesday += to_add
         shuffle(self.new_bringers)
         self.data.default = json.dumps(
-            [{'person_id': b.person_id, 'date': b.date.strftime('%Y-%m-%d')}
+            [{'person_id': b['person_id'], 'date': b['date'].strftime('%Y-%m-%d')}
              for b in self.new_bringers]
         )
         self.process()
-        db.session.rollback()
