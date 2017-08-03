@@ -1,0 +1,11 @@
+{
+  "MAIL_SERVER": "localhost",
+  "MAIL_PORT": 25,
+  "MAIL_USE_TLS": false,
+  "MAIL_USE_SSL": false,
+  "MAIL_USERNAME": null,
+  "MAIL_PASSWORD": null,
+  "MAIL_DEFAULT_SENDER": null,
+  "MAIL_MAX_EMAILS": null,
+  "MAIL_ASCII_ATTACHMENTS": false
+}
