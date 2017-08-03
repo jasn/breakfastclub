@@ -33,7 +33,7 @@ class ShowLoginForm(FlaskForm):
         if not super().validate():
             return False
         token = self.token.data
-        person = db.session.query(Person).filter_by(token=token).first()
+        person = db.session.query(Person).filter_by(token=token).scalar()
         if person is None:
             self.token.errors.append('Invalid token.')
             return False
