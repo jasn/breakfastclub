@@ -3,8 +3,11 @@ import datetime
 from datetime import timedelta
 from random import shuffle
 
-from wtforms import StringField, validators, widgets
+from wtforms import HiddenField, StringField, validators, widgets
+from wtforms.fields import FieldList, FormField, BooleanField
+
 from flask_wtf import FlaskForm
+
 from wtforms.widgets.html5 import EmailInput
 from wtforms.widgets import HiddenInput
 from breakfastclub.models import Person, BreadList
@@ -110,3 +113,70 @@ class GenerateBreadListForm(FlaskForm):
              for b in self.new_bringers]
         )
         self.process()
+
+class TokenManagementSubForm(FlaskForm):
+    person_id = StringField('id', widget=HiddenInput())  # id is being shadowed
+    person_name = StringField('name', validators=[validators.InputRequired()])  # name is being shadowed
+    email = StringField('email', validators=[validators.InputRequired()])
+    token_link = StringField('token_link')
+    generate_token = BooleanField('generate_token')
+    email_token = BooleanField('email_token')
+
+    # def process(self, formdata=None, obj=None, **kwargs):
+    #     super().process(formdata, obj, kwargs)
+    #     self.id.default = kwargs['id']
+    #     self.name.default = kwargs['name']
+    #     self.email.default = kwargs['email']
+    #     self.token_link.default = kwargs['token_link']
+
+    #     self.id.process(formdata)
+    #     self.name.process(formdata)
+    #     self.email.process(formdata)
+    #     self.token_link.process(formdata)
+
+class TokenManagementFormBase(FlaskForm):
+
+    keys = ['person_name', 'email', 'token_link',
+            'generate_token', 'email_token']
+
+    def rows(self):
+        for person in self.persons:
+            yield {k: getattr(self, k + '_' + str(person.id))
+                   for k in self.keys}
+
+    def validate(self):
+        if not super().validate():
+            return False
+
+        for person in self.persons:
+            person_changed = False
+            person.name = getattr(self, 'person_name_' + str(person.id)).data
+        db.session.commit()
+        return True
+
+
+def get_token_management_form(persons):
+
+    fields = {}
+    for person in persons:
+        fields['person_name_' + str(person.id)] = StringField(
+            default=person.name,
+            validators=[validators.InputRequired()],
+        )
+        fields['email_' + str(person.id)] = StringField(
+            default=person.email,
+            validators=[validators.InputRequired()],
+        )
+        fields['token_link_' + str(person.id)] = StringField(default=person.token)
+        fields['generate_token_' + str(person.id)] = BooleanField(default=False)
+        fields['email_token_' + str(person.id)] = BooleanField(default=False)
+
+    TokenManagementForm = type('TokenManagementForm',
+                               (TokenManagementFormBase,),
+                               fields)
+    TokenManagementForm.persons = persons
+    return TokenManagementForm
+
+
+class TokenManagementForm(FlaskForm):
+    rows = FieldList(FormField(TokenManagementSubForm, separator='_'))

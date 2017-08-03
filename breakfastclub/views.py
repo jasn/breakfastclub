@@ -2,11 +2,15 @@ import datetime
 
 from flask import flash, Flask, render_template, request, redirect, url_for
 from flask_login import login_user, login_required
+from flask_wtf import FlaskForm
 
 from breakfastclub import app, db, login_manager
 from breakfastclub.models import Person, BreadList
 
-from breakfastclub.forms import AddPersonForm, ShowLoginForm, GenerateBreadListForm
+from breakfastclub.forms import (
+    AddPersonForm, ShowLoginForm, GenerateBreadListForm, TokenManagementSubForm,
+    get_token_management_form,
+)
 
 @app.route('/')
 def index():
@@ -34,6 +38,7 @@ def show_generate_breadlist():
 
 
 @app.route('/people')
+@login_required
 def show_people():
     people = db.session.query(Person.name, Person.email)
     return render_template('people.html', people=people)
@@ -56,7 +61,8 @@ def show_login():
 login_manager.login_view = 'show_login'
 
 
-@app.route('/people/add', methods=['POST', 'GET'])
+@app.route('/signup', methods=['POST', 'GET'])
+@login_required
 def add_person():
     form = AddPersonForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -69,8 +75,18 @@ def add_person():
     else:
         return render_template('add_person.html', form=form)
 
-
 @app.route('/breadlist')
 def show_breadlist():
     entries = db.session.query(BreadList).order_by(BreadList.date)
     return render_template('breadlist.html', breadbringers=entries)
+
+@app.route('/token_management', methods=['POST', 'GET'])
+@login_required
+def token_management():
+    people = db.session.query(Person).all()
+    people = sorted(people, key=lambda p: p.name.lower())
+    form = get_token_management_form(people)(request.form)
+    if request.method == "POST" and form.validate():
+        return "Validated!"
+    return render_template('token_management.html', form=form)
+

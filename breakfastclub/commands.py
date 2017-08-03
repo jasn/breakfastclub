@@ -31,8 +31,10 @@ The Breakfastclub
     text_message = text_message.format(name=up_next.person.name,
                                        date=up_next.date,
                                        count=count)
-    email_message = Message(text_message, sender='breakfastclub@example.com',
-                            recipients=[up_next.person.email])
+    email_message = Message(sender=app.config['EMAIL_REMINDER_SENDER'],
+                            recipients=[up_next.person.email],
+                            subject=subject,
+                            body=text_message)
     if dry_run:
         print(email_message)
     else:

@@ -1,0 +1,26 @@
+{% extends "master.html" %}
+{% block title %} Token Magement {% endblock %}
+{% block body %}
+<h1>Token Management</h1>
+<form name="form" method="post"> {{ form.csrf_token }}
+<table>
+  <tr>
+    <td>Name</td>
+    <td>Email</td>
+    <td>Token Link</td>
+    <td>Generate New Token</td>
+    <td>Send Email With Token</td>
+  </tr>
+  {% for row in form.rows() %}
+  <tr>
+    <td>{{ row.person_name }}</td>
+    <td>{{ row.email }}</td>
+    <td>{{ row.token_link }}</td>
+    <td class="checkbox">{{ row.generate_token }}</td>
+    <td class="checkbox">{{ row.email_token }}</td>
+  </tr>
+  {% endfor %}
+</table>
+<input type="submit" value="Execute">
+</form>
+{% endblock %}
