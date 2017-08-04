@@ -1,21 +1,20 @@
-import click
-import datetime
-from random import shuffle
+from flask_login import UserMixin  # , AnonymousUserMixin
 
-from flask_login import UserMixin, AnonymousUserMixin
+from breakfastclub import db
 
-from breakfastclub import app, db, migrate, login_manager
 
 class Person(db.Model, UserMixin):
     __tablename__ = 'person'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(191), nullable=False)  # varchar max length utf8mb4
+    email = db.Column(db.String(191),
+                      nullable=False)  # varchar max length utf8mb4
     active = db.Column(db.Boolean, default=True, nullable=False)
     token = db.Column(db.String(128))
     is_admin = db.Column(db.Boolean, default=False, nullable=False)
-    breadlist_set = db.relationship('BreadList', backref='person', lazy='dynamic')
+    breadlist_set = db.relationship('BreadList', backref='person',
+                                    lazy='dynamic')
 
     def __repr__(self):
         return '<Person(name=%s, email=%s)>' % (self.name, self.email)
@@ -39,6 +38,6 @@ class BreadList(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.Date, nullable=False)
     person_id = db.Column(db.Integer,
-                          db.ForeignKey(Person.id, name='fk_breadlist_person_id'),
+                          db.ForeignKey(Person.id,
+                                        name='fk_breadlist_person_id'),
                           nullable=False)
-

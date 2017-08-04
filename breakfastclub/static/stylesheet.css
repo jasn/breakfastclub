@@ -9,3 +9,51 @@ tr.bringer {
 td.checkbox {
     text-align: center;
 }
+
+.token_management {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.token_management tr:nth-child(odd) {
+    background-color: white;
+}
+
+.token_management tr {
+    background-color: #DDDDDD;
+    border-spacing: 0px;
+}
+
+.token_management th {
+    font-size: 10pt;
+}
+.token_management td {
+    padding: 4px;
+    border-spacing: 0px;
+    font-size: 10pt;
+}
+
+div.body {
+    margin: auto;
+    width: 90%;
+}
+
+table.breakfastlist {
+    width: 20%;
+}
+
+table.breakfastlist td:nth-child(2){
+    width: 90px;
+}
+
+.breakfastlist th {
+    text-align: left;
+}
+
+table.personlist {
+    width: 80%;
+}
+
+.personlist .name {
+    width: 30%;
+}

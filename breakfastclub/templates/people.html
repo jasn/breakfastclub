@@ -1,13 +1,38 @@
-<html>
-  <head>
-    <title>Add person</title>
-  </head>
-  <body>
-    Here there will be a list of people.
-    <ul>
-      {% for person in people %}
-      <li>{{ person.name }}, {{ person.email }}</li>
-      {% endfor %}
-    </ul>
-  </body>
-</html>
+{% extends "master.html" %}
+{% block title %}People{% endblock %}
+{% block body %}
+<h1>Participants</h1>
+<a href="{{ url_for('index') }}">Bread list</a><br><br>
+<b>Active People</b>
+<table class="personlist">
+  <tr>
+    <td class="name">Name</td>
+    <td class="email">Email</td>
+  </tr>
+  {% for person in people %}
+  {% if person.active %}
+  <tr>
+    <td>{{ person.name }}</td>
+    <td>{{ person.email }}</td>
+  </tr>
+  {% endif %}
+  {% endfor %}
+</table><br>
+<ul>
+</ul>
+<b>Inactive People</b>
+<table class="personlist">
+  <tr>
+    <td class="name">Name</td>
+    <td class="email">Email</td>
+  </tr>
+  {% for person in people %}
+  {% if not person.active %}
+  <tr>
+    <td>{{ person.name }}</td>
+    <td>{{ person.email }}</td>
+  </tr>
+  {% endif %}
+  {% endfor %}
+</table>
+{% endblock %}

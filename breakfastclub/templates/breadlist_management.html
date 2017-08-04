@@ -1,0 +1,8 @@
+{% extends "master.html" %}
+{% block title %}Breadlist Management{% endblock %}
+{% block body %}
+<h1>Breadlist Management</h1>
+<a href="{{ url_for('index') }}">Breadlist</a><br><br>
+<a href="{{ url_for('show_generate_breadlist') }}">Breadlist generation</a> &nbsp; | &nbsp;
+<a href="{{ url_for('confirm_send_notify_new_breadlist') }}">Notify active users new breadlist will be generated soon.</a><br><br>
+{% endblock %}

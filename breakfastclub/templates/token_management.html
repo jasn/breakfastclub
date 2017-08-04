@@ -2,20 +2,25 @@
 {% block title %} Token Magement {% endblock %}
 {% block body %}
 <h1>Token Management</h1>
+<a href="{{ url_for('index') }}">Breadlist</a><br><br>
 <form name="form" method="post"> {{ form.csrf_token }}
-<table>
+<table class="token_management" border="0" cellpadding="0" cellspacing="0">
   <tr>
-    <td>Name</td>
-    <td>Email</td>
-    <td>Token Link</td>
-    <td>Generate New Token</td>
-    <td>Send Email With Token</td>
+    <th>Name</th>
+    <th>Email</th>
+    <th>Token Link</th>
+    <th>Generate New Token</th>
+    <th>Send Email With Token</th>
   </tr>
   {% for row in form.rows() %}
   <tr>
     <td>{{ row.person_name }}</td>
-    <td>{{ row.email }}</td>
-    <td>{{ row.token_link }}</td>
+    <td>{{ row.person_email }}</td>
+    {% if row.token_link != None %}
+    <td><a href="{{ url_for('attempt_login', token=row.token_link )}}">{{ url_for('attempt_login', token=row.token_link, _external=True)}}</a></td>
+    {% else %}
+    <td><b>No Token</b></td>
+    {% endif %}
     <td class="checkbox">{{ row.generate_token }}</td>
     <td class="checkbox">{{ row.email_token }}</td>
   </tr>

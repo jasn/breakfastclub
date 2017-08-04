@@ -2,8 +2,23 @@
 
 {% block body %}
 <h1>Welcome to the Breakfastclub</h1>
-{% include 'breadlist.html' %}
 {% if current_user.is_admin %}
-<a href="/admin/">Admin Page</a> <a href="{{ url_for('show_generate_breadlist') }}">Generate Breadlist</a>
+<a href="/admin/">Admin Page</a>&nbsp;|&nbsp;
+<a href="{{ url_for('breadlist_management') }}">Breadlist Management</a>&nbsp;|&nbsp;
+<a href="{{ url_for('token_management')  }}">Token Management</a>
+<br><br>
 {% endif %}
+{% if current_user.is_authenticated %}
+<a href="{{ url_for('show_people') }}">List of Participants</a>
+<br><br>
+{% if current_user.active %}
+You are currently <b>Active</b>, which means you <b>will</b> be put on the next bread list.<br>
+<a href="{{ url_for('deactivate_current_user') }}">Become Inactive</a> (You can always change your mind).
+{% else %}
+You are currently <b>Inactive</b>, which mean you <b>will not</b> be put on the next bread list.<br>
+<a href="{{ url_for('activate_current_user') }}">Become Active</a> (You can always change your mind).
+{% endif %}
+<br><br>
+{% endif %}
+{% include 'breadlist.html' %}
 {% endblock %}

@@ -2,10 +2,51 @@ import datetime
 
 import click
 
+from flask import url_for
 from flask_mail import Message
 
 from breakfastclub import app, db, mail
 from breakfastclub.models import Person, BreadList
+
+
+@app.cli.command('send-mail-list-running-out')
+@click.option('-n', '--dry-run', is_flag=True)
+def send_mail_list_running_out(dry_run):
+    qs = db.session.query(BreadList.date)
+    qs = qs.order_by(BreadList.date.desc())
+    last_date = qs.first()
+    today = datetime.date.today()
+    if last_date - today > 7:
+        print("At least two entries in the list remaining.")
+        return
+
+    qs = db.session.query(Person)
+    qs = qs.filter(Person.is_admin == True)  # noqa
+    admins = qs.all()
+    subject = "[Breakfastclub] The list is running out."
+    body_template = """Dear administrator,
+The breakfastclub list of who is bringing bread next is running out and a new
+one needs to be generated.
+
+Please log in at
+{link}
+And generate a new list.
+Best regards,
+The Breakfastclub
+"""
+    for admin in admins:
+        body = body_template.format(link=url_for('attempt_login',
+                                                 token=admin.token,
+                                                 _external=True))
+        email_message = mail(sender=app.config['EMAIL_SENDER'],
+                             recipient=admin.email,
+                             subject=subject,
+                             body=body)
+        if not dry_run:
+            mail.send(email_message)
+        else:
+            print(email_message)
+    return
 
 
 @app.cli.command('send-mail-reminder')
@@ -25,13 +66,13 @@ The Breakfastclub
     up_next = qs.first()
 
     qs = db.session.query(Person)
-    qs = qs.filter(Person.active == True)
+    qs = qs.filter(Person.active == True)  # noqa
     count = qs.count()
 
     text_message = text_message.format(name=up_next.person.name,
                                        date=up_next.date,
                                        count=count)
-    email_message = Message(sender=app.config['EMAIL_REMINDER_SENDER'],
+    email_message = Message(sender=app.config['EMAIL_SENDER'],
                             recipients=[up_next.person.email],
                             subject=subject,
                             body=text_message)

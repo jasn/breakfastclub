@@ -1,12 +1,14 @@
 {% extends "master.html" %}
-
+{% block title %}Generate New Breadlist{% endblock %}
 {% block body %}
+<h1>Generate New Breadlist</h1>
+<a href="{{ url_for('breadlist_management') }}">Breadlist Management</a><br><br>
 {% if form.data.errors %}
 {{ form.data.errors }}
 {% endif %}
 <form method="post"> {{ form.csrf_token }}
   {{ form.data }}
-<table>
+<table class="breakfastlist">
   <tr>
     <th>Navn</th>
     <th>Dato</th>
@@ -29,6 +31,7 @@
   </tr>
   {% endfor %}
 </table>
-<input type="submit" value="Create">
+<input type="submit" value="Accept List">
+<input type="button" value="New list" onclick="window.location.reload();">
 </form>
 {% endblock %}

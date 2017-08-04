@@ -1,18 +1,23 @@
-import json
 import datetime
-from datetime import timedelta
-from random import shuffle
+import json
+import string
 
-from wtforms import HiddenField, StringField, validators, widgets
-from wtforms.fields import FieldList, FormField, BooleanField
+from datetime import timedelta
+from random import shuffle, choices
+
+from wtforms import StringField, validators
+from wtforms.fields import BooleanField, SubmitField
 
 from flask_wtf import FlaskForm
+from flask_mail import Message
+from flask import url_for
 
 from wtforms.widgets.html5 import EmailInput
 from wtforms.widgets import HiddenInput
 from breakfastclub.models import Person, BreadList
 
-from breakfastclub import db
+from breakfastclub import db, app
+
 
 class AddPersonForm(FlaskForm):
 
@@ -29,6 +34,7 @@ class AddPersonForm(FlaskForm):
         widget=EmailInput(),
     )
 
+
 class ShowLoginForm(FlaskForm):
     token = StringField('token', [validators.InputRequired()])
 
@@ -43,6 +49,7 @@ class ShowLoginForm(FlaskForm):
 
         self.person = person
         return True
+
 
 class GenerateBreadListForm(FlaskForm):
 
@@ -64,8 +71,8 @@ class GenerateBreadListForm(FlaskForm):
         if len(person_ids) != len(set(person_ids)):
             self.data.errors.append('Duplicate person.')
             return False
-        people = list(db.session.query(Person).filter(Person.id.in_(person_ids),
-                                                      Person.active == True))
+        people = db.session.query(Person).filter(Person.id.in_(person_ids),
+                                                 Person.active == True).all()  # noqa
         if len(people) != len(person_ids):
             self.data.errors.append('Inactive person or invalid person.')
             return False
@@ -95,7 +102,7 @@ class GenerateBreadListForm(FlaskForm):
             return date + to_add
 
         super().__init__(*args, **kwargs)
-        people = db.session.query(Person).filter(Person.active==True).all()
+        people = db.session.query(Person).filter(Person.active ==  True).all()  # noqa
         qs = db.session.query(BreadList)
         qs = qs.order_by(BreadList.date.desc())
         max_date = qs.first()
@@ -104,39 +111,53 @@ class GenerateBreadListForm(FlaskForm):
         next_tuesday = find_next_tuesday(basis)
         to_add = timedelta(days=7)
         self.new_bringers = []
+        shuffle(people)
         for person in people:
-            self.new_bringers.append(dict(person=person, person_id=person.id, date=next_tuesday))
+            self.new_bringers.append(dict(person=person, person_id=person.id,
+                                          date=next_tuesday))
             next_tuesday += to_add
-        shuffle(self.new_bringers)
+        self.new_bringers = sorted(self.new_bringers, key=lambda p: p['date'],
+                                   reverse=True)
         self.data.default = json.dumps(
-            [{'person_id': b['person_id'], 'date': b['date'].strftime('%Y-%m-%d')}
+            [{'person_id': b['person_id'],
+              'date': b['date'].strftime('%Y-%m-%d')}
              for b in self.new_bringers]
         )
         self.process()
 
-class TokenManagementSubForm(FlaskForm):
-    person_id = StringField('id', widget=HiddenInput())  # id is being shadowed
-    person_name = StringField('name', validators=[validators.InputRequired()])  # name is being shadowed
-    email = StringField('email', validators=[validators.InputRequired()])
-    token_link = StringField('token_link')
-    generate_token = BooleanField('generate_token')
-    email_token = BooleanField('email_token')
 
-    # def process(self, formdata=None, obj=None, **kwargs):
-    #     super().process(formdata, obj, kwargs)
-    #     self.id.default = kwargs['id']
-    #     self.name.default = kwargs['name']
-    #     self.email.default = kwargs['email']
-    #     self.token_link.default = kwargs['token_link']
+def generate_token():
+    chars = string.ascii_letters + string.digits
+    new_token = choices(chars, k=64)
+    return ''.join(new_token)
 
-    #     self.id.process(formdata)
-    #     self.name.process(formdata)
-    #     self.email.process(formdata)
-    #     self.token_link.process(formdata)
+
+def send_mail_with_token(person):
+    external_link = url_for('attempt_login', token=person.token,
+                            _external=True)
+    subject = "[Breakfastclub] Requested Token"
+    body = """Hi {name}
+You requested your token for the breakfastclub app.
+
+Click the link below to login.
+{link}
+
+Best regards,
+The Breakfastclub
+"""
+    body = body.format(name=person.name, link=external_link)
+    email_message = Message(sender=app.config['EMAIL_SENDER'],
+                            recipients=[person.email],
+                            subject=subject,
+                            body=body)
+    print(email_message)
+    # mail.send(email_message)
+    return
+
 
 class TokenManagementFormBase(FlaskForm):
 
-    keys = ['person_name', 'email', 'token_link',
+    keys = ['person_name', 'person_email', 'token_link',
             'generate_token', 'email_token']
 
     def rows(self):
@@ -148,10 +169,35 @@ class TokenManagementFormBase(FlaskForm):
         if not super().validate():
             return False
 
+        requested_token = []
         for person in self.persons:
-            person_changed = False
+            if not hasattr(self, 'person_name_' + str(person.id)):
+                continue
             person.name = getattr(self, 'person_name_' + str(person.id)).data
+            person.email = getattr(self, 'person_email_' + str(person.id)).data
+
+            generate_token_field = getattr(
+                self,
+                'generate_token_' + str(person.id)
+            ).data
+            email_token_field = getattr(
+                self,
+                'email_token_' + str(person.id)
+            ).data
+
+            if generate_token_field:
+                print("generate new token for {name}".format(name=person.name))
+                new_token = generate_token()
+                print("{name}'s new token is: {token}".format(name=person.name,
+                                                              token=new_token))
+                person.token = new_token
+
+            if email_token_field:
+                requested_token.append(person)
         db.session.commit()
+
+        for person in requested_token:
+            send_mail_with_token(person)
         return True
 
 
@@ -159,17 +205,18 @@ def get_token_management_form(persons):
 
     fields = {}
     for person in persons:
-        fields['person_name_' + str(person.id)] = StringField(
+        id_str = str(person.id)
+        fields['person_name_' + id_str] = StringField(
             default=person.name,
             validators=[validators.InputRequired()],
         )
-        fields['email_' + str(person.id)] = StringField(
+        fields['person_email_' + id_str] = StringField(
             default=person.email,
             validators=[validators.InputRequired()],
         )
-        fields['token_link_' + str(person.id)] = StringField(default=person.token)
-        fields['generate_token_' + str(person.id)] = BooleanField(default=False)
-        fields['email_token_' + str(person.id)] = BooleanField(default=False)
+        fields['token_link_' + id_str] = person.token
+        fields['generate_token_' + id_str] = BooleanField(default=False)
+        fields['email_token_' + id_str] = BooleanField(default=False)
 
     TokenManagementForm = type('TokenManagementForm',
                                (TokenManagementFormBase,),
@@ -178,5 +225,17 @@ def get_token_management_form(persons):
     return TokenManagementForm
 
 
-class TokenManagementForm(FlaskForm):
-    rows = FieldList(FormField(TokenManagementSubForm, separator='_'))
+class ConfirmEmailNotifyForm(FlaskForm):
+    confirm = SubmitField('confirm')
+    cancel = SubmitField('cancel')
+
+    def validate(self):
+        if not super().validate():
+            return False
+        if self.cancel.data is True:
+            return False
+
+        if self.confirm.dat is True:
+            return True
+
+        return False

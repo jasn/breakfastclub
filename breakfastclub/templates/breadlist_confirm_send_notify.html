@@ -1,0 +1,10 @@
+{% extends "master.html" %}
+{% block title %}Confirm Send Notification{% endblock %}
+{% block body %}
+<h1>Confirm Email Notification</h1>
+Please confirm you wish to send an email to all active participants of the breakfastclub.
+<form method="post"> {{ form.csrf_token }}
+  {{ form.confirm }}
+  {{ form.cancel }}
+</form>
+{% endblock %}

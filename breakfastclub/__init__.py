@@ -9,9 +9,9 @@ from flask_wtf.csrf import CSRFProtect
 from flask_mail import Mail
 
 
-
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://breakfast:monster@localhost/breakfastclub'
+mysql_connect_string = 'mysql://breakfast:monster@localhost/breakfastclub'
+app.config['SQLALCHEMY_DATABASE_URI'] = mysql_connect_string
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = '13'
 
@@ -20,7 +20,7 @@ this_directory = os.path.dirname(__file__)
 email_config_path = os.path.join(this_directory, 'email_config.json')
 with open(email_config_path) as email_config_file:
     app.config.update(json.load(email_config_file))
-app.config['EMAIL_REMINDER_SENDER'] = 'breakfastclub@example.com'
+app.config['EMAIL_SENDER'] = 'breakfastclub@example.com'
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
@@ -28,10 +28,10 @@ login_manager = LoginManager(app)
 csrf = CSRFProtect(app)
 mail = Mail(app)
 
-from . import models
-from . import views
-from . import admin
-from . import commands
+from . import models  # noqa
+from . import views   # noqa
+from . import admin   # noqa
+from . import commands  # noqa
 
 
 @login_manager.user_loader
