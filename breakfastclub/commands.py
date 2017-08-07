@@ -12,11 +12,11 @@ from breakfastclub.models import Person, BreadList
 @app.cli.command('send-mail-list-running-out')
 @click.option('-n', '--dry-run', is_flag=True)
 def send_mail_list_running_out(dry_run):
-    qs = db.session.query(BreadList.date)
+    qs = db.session.query(BreadList)
     qs = qs.order_by(BreadList.date.desc())
-    last_date = qs.first()
+    last_date = qs.first().date
     today = datetime.date.today()
-    if last_date - today > 7:
+    if (last_date - today).days > 7:
         print("More than one week remaining in the list.")
         return
 
@@ -35,14 +35,15 @@ And generate a new list.
 Best regards,
 The Breakfastclub
 """
+
     for admin in admins:
         body = body_template.format(link=url_for('attempt_login',
                                                  token=admin.token,
                                                  _external=True))
-        email_message = mail(sender=app.config['EMAIL_SENDER'],
-                             recipient=admin.email,
-                             subject=subject,
-                             body=body)
+        email_message = Message(sender=app.config['EMAIL_SENDER'],
+                                recipients=[admin.email],
+                                subject=subject,
+                                body=body)
         if not dry_run:
             mail.send(email_message)
         else:
