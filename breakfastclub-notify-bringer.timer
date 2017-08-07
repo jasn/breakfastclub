@@ -1,0 +1,9 @@
+[Unit]
+Description=Breakfastclub bringer notification
+
+[Timer]
+OnCalendar=Mon *-*-* 10:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target

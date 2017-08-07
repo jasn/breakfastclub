@@ -1,0 +1,12 @@
+[Unit]
+Description=Breakfastclub admin notification
+After=gunicorn-breakfastclub.service
+
+[Service]
+User=http
+Group=http
+WorkingDirectory=/var/www/apps/breakfastclub
+ExecStart=/var/www/apps/breakfastclub/.env/bin/flask send-mail-list-running-out --dry-run
+Environment=BREAKFASTCLUB_CONFIG=prod-config.json FLASK_APP=breakfastclub/__init__.py
+RemainAfterExit=No
+

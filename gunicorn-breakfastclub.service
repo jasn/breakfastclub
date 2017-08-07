@@ -1,0 +1,13 @@
+[Unit]
+Description=Breakfastclub server
+After=network.target
+
+[Service]
+User=http
+Group=http
+WorkingDirectory=/var/www/apps/breakfastclub
+ExecStart=/var/www/apps/breakfastclub/.env/bin/gunicorn --workers 3 --bind 127.0.0.1:8002 breakfastclub:app
+Environment=BREAKFASTCLUB_CONFIG=prod-config.json
+
+[Install]
+WantedBy=multi-user.target
