@@ -1,0 +1,14 @@
+{
+  "SERVER_NAME": "https://apps.cs.au.dk/breakfastclub",
+  "SQLALCHEMY_TRACK_MODIFICATIONS": false,
+  "MAIL_SERVER": "localhost",
+  "MAIL_PORT": 2525,
+  "MAIL_USE_TLS": false,
+  "MAIL_USE_SSL": false,
+  "MAIL_USERNAME": null,
+  "MAIL_PASSWORD": null,
+  "MAIL_DEFAULT_SENDER": "rav@cs.au.dk",
+  "MAIL_MAX_EMAILS": null,
+  "MAIL_ASCII_ATTACHMENTS": false,
+  "EMAIL_SENDER": "rav@cs.au.dk"
+}
