@@ -20,7 +20,6 @@ this_directory = os.path.dirname(__file__)
 email_config_path = os.path.join(this_directory, 'email_config.json')
 with open(email_config_path) as email_config_file:
     app.config.update(json.load(email_config_file))
-app.config['EMAIL_SENDER'] = 'breakfastclub@example.com'
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)

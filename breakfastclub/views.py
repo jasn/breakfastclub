@@ -2,8 +2,9 @@ import datetime
 
 from flask import flash, render_template, request, redirect, url_for
 from flask_login import login_user, login_required, current_user
+from flask_mail import Message
 
-from breakfastclub import app, db, login_manager
+from breakfastclub import app, db, login_manager, mail
 from breakfastclub.models import Person, BreadList
 
 from breakfastclub.forms import (
@@ -142,7 +143,26 @@ def breadlist_management():
 
 
 def send_notification_new_breadlist_coming(person):
-    pass
+    subject = "[Breakfastclub] Reminder: New bread list soon."
+    message_template = """Hello {name}
+This is a reminder that a new bread list will be generated soon.
+
+If you no longer wish to partake in the breakfastclub you can sign in and deactivate yourself at the link below.
+{link}
+
+Best regards,
+The Breakfastclub
+"""
+    body = message_template.format(name=person.name,
+                                   link=url_for('attempt_login',
+                                                token=person.token,
+                                                _external=True))
+
+    email_message = Message(subject=subject, body=body,
+                            recipients=[person.email],
+                            sender=app.config['EMAIL_SENDER'])
+    mail.send(email_message)
+    return
 
 
 @app.route('/breadlist_management/confirm_notify', methods=['GET', 'POST'])
@@ -154,9 +174,18 @@ def confirm_send_notify_new_breadlist():
     form = ConfirmEmailNotifyForm(request.form)
     if request.method == "POST" and form.validate():
         people = db.session.query(Person).filter(Person.active == True).all()  # noqa
+        count = 0
         for person in people:
-            send_notification_new_breadlist_coming(person)
-        count = len(people)
+            try:
+                send_notification_new_breadlist_coming(person, mail_conn)
+                count += 1
+            except Exception:
+                if count == 0:
+                    flash("Something went wrong. No email sent.")
+                    return redirect(url_for('index'))
+                else:
+                    msg = "Could not send an email to %s." % person.email
+                    flash(msg)
         flash("Email notifications sent to {count}.".format(count=count))
         return redirect(url_for('index'))
     elif request.method == "POST":

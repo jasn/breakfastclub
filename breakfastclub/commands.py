@@ -17,7 +17,7 @@ def send_mail_list_running_out(dry_run):
     last_date = qs.first()
     today = datetime.date.today()
     if last_date - today > 7:
-        print("At least two entries in the list remaining.")
+        print("More than one week remaining in the list.")
         return
 
     qs = db.session.query(Person)
@@ -25,12 +25,13 @@ def send_mail_list_running_out(dry_run):
     admins = qs.all()
     subject = "[Breakfastclub] The list is running out."
     body_template = """Dear administrator,
-The breakfastclub list of who is bringing bread next is running out and a new
+The breakfastclub bread list is running out and a new
 one needs to be generated.
 
 Please log in at
 {link}
 And generate a new list.
+
 Best regards,
 The Breakfastclub
 """
@@ -56,6 +57,7 @@ def send_mail_reminder(dry_run):
     text_message = """Hello {name}.
 You are bringing breakfast on {date}.
 There are currently {count} people participating in the breakfastclub.
+
 Best regards,
 The Breakfastclub
 """

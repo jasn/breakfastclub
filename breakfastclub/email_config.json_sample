@@ -7,5 +7,6 @@
   "MAIL_PASSWORD": null,
   "MAIL_DEFAULT_SENDER": null,
   "MAIL_MAX_EMAILS": null,
-  "MAIL_ASCII_ATTACHMENTS": false
+  "MAIL_ASCII_ATTACHMENTS": false,
+  "EMAIL_SENDER": "breakfastclub@example.com"
 }

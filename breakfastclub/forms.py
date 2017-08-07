@@ -235,7 +235,7 @@ class ConfirmEmailNotifyForm(FlaskForm):
         if self.cancel.data is True:
             return False
 
-        if self.confirm.dat is True:
+        if self.confirm.data is True:
             return True
 
         return False
