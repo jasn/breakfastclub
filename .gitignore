@@ -2,4 +2,6 @@ breakfastclub.egg-info
 *~
 __pycache__
 .env
-breakfastclub/email_config.json
+breakfastclub/config.json
+breakfastclub/config_secret.json
+.#*

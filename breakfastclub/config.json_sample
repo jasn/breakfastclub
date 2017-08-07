@@ -1,4 +1,7 @@
 {
+  "SERVER_NAME": "https://localhost:5000/sub_path/",
+  "SQLALCHEMY_TRACK_MODIFICATIONS": false,
+  "SECRET_KEY": "13",
   "MAIL_SERVER": "localhost",
   "MAIL_PORT": 25,
   "MAIL_USE_TLS": false,

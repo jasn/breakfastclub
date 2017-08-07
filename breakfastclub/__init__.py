@@ -10,17 +10,20 @@ from flask_mail import Mail
 
 
 app = Flask(__name__)
-mysql_connect_string = 'mysql://breakfast:monster@localhost/breakfastclub'
-app.config['SQLALCHEMY_DATABASE_URI'] = mysql_connect_string
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.secret_key = '13'
 
-# read email config
 this_directory = os.path.dirname(__file__)
-email_config_path = os.path.join(this_directory, 'email_config.json')
-with open(email_config_path) as email_config_file:
-    app.config.update(json.load(email_config_file))
-app.config['SERVER_NAME'] = 'localhost:5000'
+config_path = os.path.join(this_directory,
+                           os.environ.get('BREAKFASTCLUB_CONFIG',
+                                          'config.json'))
+config_secret_path = os.path.join(this_directory,
+                                  os.environ.get('BREAKFASTCLUB_CONFIG_SECRET',
+                                                 'config_secret.json'))
+with open(config_path) as config_file:
+    app.config.update(json.load(config_file))
+with open(config_secret_path) as config_file:
+    app.config.update(json.load(config_file))
+    app.secret_key = app.config['SECRET_KEY']
+
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 login_manager = LoginManager(app)
