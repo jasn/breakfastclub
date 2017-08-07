@@ -6,8 +6,8 @@ After=network.target
 User=http
 Group=http
 WorkingDirectory=/var/www/apps/breakfastclub
-ExecStart=/var/www/apps/breakfastclub/.env/bin/gunicorn --workers 3 --bind 127.0.0.1:8002 breakfastclub:app
-Environment=BREAKFASTCLUB_CONFIG=prod-config.json
+ExecStart=/var/www/apps/breakfastclub/.env/bin/gunicorn --workers 3 --bind 127.0.0.1:8003 breakfastclub:app
+Environment=BREAKFASTCLUB_CONFIG=prod-config.json FLASK_APP=breakfastclub/__init__.py
 
 [Install]
 WantedBy=multi-user.target

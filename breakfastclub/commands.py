@@ -37,9 +37,9 @@ The Breakfastclub
 """
 
     for admin in admins:
-        body = body_template.format(link=url_for('attempt_login',
-                                                 token=admin.token,
-                                                 _external=True))
+        login_link = (app.config['SITE_ADDRESS'] +
+                      'attempt_login/{token}'.format(token=person.token))
+        body = body_template.format(link=login_link)
         email_message = Message(sender=app.config['EMAIL_SENDER'],
                                 recipients=[admin.email],
                                 subject=subject,

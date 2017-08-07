@@ -1,5 +1,5 @@
 {
-  "SERVER_NAME": "https://apps.cs.au.dk/breakfastclub",
+  "SITE_ADDRESS": "https://apps.cs.au.dk/breakfastclub",
   "SQLALCHEMY_TRACK_MODIFICATIONS": false,
   "MAIL_SERVER": "localhost",
   "MAIL_PORT": 2525,
