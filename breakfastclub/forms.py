@@ -151,7 +151,7 @@ The Breakfastclub
                             subject=subject,
                             body=body)
     print(email_message)
-    # mail.send(email_message)
+    mail.send(email_message)
     return
 
 
