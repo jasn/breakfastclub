@@ -38,7 +38,7 @@ The Breakfastclub
 
     for admin in admins:
         login_link = (app.config['SITE_ADDRESS'] +
-                      'attempt_login/{token}'.format(token=person.token))
+                      'attempt_login/{token}'.format(token=admin.token))
         body = body_template.format(link=login_link)
         email_message = Message(sender=app.config['EMAIL_SENDER'],
                                 recipients=[admin.email],
