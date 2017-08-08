@@ -27,7 +27,7 @@ class BreakfastclubAdminIndexView(AdminIndexView):
 
 
 admin = Admin(app, name='breakfastclub',
-              index_view=BreakfastclubAdminIndexView())
+              index_view=BreakfastclubAdminIndexView(endpoint='admin'))
 
 admin.add_view(BreakfastclubModelView(models.Person, db.session))
 admin.add_view(BreakfastclubModelView(models.BreadList, db.session))

@@ -3,7 +3,7 @@
 {% block body %}
 <h1>Welcome to the Breakfastclub</h1>
 {% if current_user.is_admin %}
-<a href="/admin/">Admin Page</a>&nbsp;|&nbsp;
+<a href="{{ url_for('admin.index') }}">Admin Page</a>&nbsp;|&nbsp;
 <a href="{{ url_for('breadlist_management') }}">Breadlist Management</a>&nbsp;|&nbsp;
 <a href="{{ url_for('token_management')  }}">Token Management</a>
 <br><br>
