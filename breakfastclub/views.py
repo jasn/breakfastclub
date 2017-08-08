@@ -17,9 +17,13 @@ from breakfastclub.forms import (
 def index():
     breadlist = db.session.query(BreadList).order_by(BreadList.date.desc())
     today = datetime.date.today()
-    next_bringer = min((b for b in breadlist if b.date >= today),
-                       key=lambda b: b.date)
-    next_bringer.is_next = True
+    try:
+        next_bringer = min((b for b in breadlist if b.date >= today),
+                           key=lambda b: b.date)
+        next_bringer.is_next = True
+    except ValueError:
+        pass
+
     return render_template('index.html', breadbringers=breadlist)
 
 
@@ -30,9 +34,12 @@ def show_generate_breadlist():
     qs = qs.order_by(BreadList.date.desc()).limit(old_length_cap + 1)
     breadlist = qs.all()
     today = datetime.date.today()
-    next_bringer = min((b for b in breadlist if b.date >= today),
-                       key=lambda b: b.date)
-    next_bringer.is_next = True
+    try:
+        next_bringer = min((b for b in breadlist if b.date >= today),
+                           key=lambda b: b.date)
+        next_bringer.is_next = True
+    except ValueError:
+        pass
     breadlist = breadlist[:5]
     form = GenerateBreadListForm(request.form)
     if request.method == 'POST' and form.validate():
