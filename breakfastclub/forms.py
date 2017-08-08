@@ -3,7 +3,7 @@ import json
 import string
 
 from datetime import timedelta
-from random import shuffle, choices
+from random import shuffle, choice
 
 from wtforms import StringField, validators
 from wtforms.fields import BooleanField, SubmitField
@@ -128,7 +128,7 @@ class GenerateBreadListForm(FlaskForm):
 
 def generate_token():
     chars = string.ascii_letters + string.digits
-    new_token = choices(chars, k=64)
+    new_token = [choice(chars) for _ in range(64)]
     return ''.join(new_token)
 
 
