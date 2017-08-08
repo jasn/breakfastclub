@@ -3,10 +3,9 @@ Description=Breakfastclub bringer notification
 After=gunicorn-breakfastclub.service
 
 [Service]
-User=http
-Group=http
+User=www-data
+Group=www-data
 WorkingDirectory=/var/www/apps/breakfastclub
 ExecStart=/var/www/apps/breakfastclub/.env/bin/flask send-mail-reminder
 Environment=BREAKFASTCLUB_CONFIG=prod-config.json FLASK_APP=breakfastclub/__init__.py
 RemainAfterExit=No
-

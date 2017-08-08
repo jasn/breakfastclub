@@ -3,8 +3,8 @@ Description=Breakfastclub server
 After=network.target
 
 [Service]
-User=http
-Group=http
+User=www-data
+Group=www-data
 WorkingDirectory=/var/www/apps/breakfastclub
 ExecStart=/var/www/apps/breakfastclub/.env/bin/gunicorn --workers 3 --bind 127.0.0.1:8003 breakfastclub:app
 Environment=BREAKFASTCLUB_CONFIG=prod-config.json FLASK_APP=breakfastclub/__init__.py
