@@ -16,7 +16,7 @@ from wtforms.widgets.html5 import EmailInput
 from wtforms.widgets import HiddenInput
 from breakfastclub.models import Person, BreadList
 
-from breakfastclub import db, app
+from breakfastclub import app, db, mail
 
 
 class AddPersonForm(FlaskForm):
