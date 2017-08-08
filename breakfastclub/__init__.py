@@ -8,9 +8,10 @@ from flask_login import LoginManager
 from flask_wtf.csrf import CSRFProtect
 from flask_mail import Mail
 
+from .reverse_proxy import ReverseProxied
 
 app = Flask(__name__)
-
+app.wsgi_app = ReverseProxied(app.wsgi_app)
 this_directory = os.path.dirname(__file__)
 config_path = os.path.join(this_directory,
                            os.environ.get('BREAKFASTCLUB_CONFIG',
