@@ -25,6 +25,7 @@ with open(config_secret_path) as config_file:
     app.config.update(json.load(config_file))
     app.secret_key = app.config['SECRET_KEY']
 
+app.config['SITE_ADDRESS'] = app.config['SITE_ADDRESS'].rstrip('/')
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 login_manager = LoginManager(app)
