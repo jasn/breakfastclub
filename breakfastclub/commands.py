@@ -35,19 +35,23 @@ And generate a new list.
 Best regards,
 The Breakfastclub
 """
-
-    for admin in admins:
-        login_link = (app.config['SITE_ADDRESS'] + '/' +
-                      'attempt_login/{token}'.format(token=admin.token))
-        body = body_template.format(link=login_link)
-        email_message = Message(sender=app.config['EMAIL_SENDER'],
-                                recipients=[admin.email],
-                                subject=subject,
-                                body=body)
-        if not dry_run:
-            mail.send(email_message)
-        else:
-            print(email_message)
+    from flask.ctx import AppContext
+    # flask cannot do url_for when no requests have been made and SERVER_NAME
+    # is unset
+    app.config['SERVER_NAME'] = 'dummy'
+    with AppContext(app):
+        for admin in admins:
+            login_link = (app.config['SITE_ADDRESS'] +
+                          url_for('attempt_login', token=admin.token, _external=False))
+            body = body_template.format(link=login_link)
+            email_message = Message(sender=app.config['EMAIL_SENDER'],
+                                    recipients=[admin.email],
+                                    subject=subject,
+                                    body=body)
+            if not dry_run:
+                mail.send(email_message)
+            else:
+                print(email_message)
     return
 
 
