@@ -68,7 +68,9 @@ The Breakfastclub
 """
     subject = "[Breakfastclub] Reminder"
     today = datetime.date.today()
+    week = datetime.timedelta(7)
     qs = db.session.query(BreadList).filter(BreadList.date >= today)
+    qs = qs.filter(BreadList.date < today+week)
     qs = qs.order_by(BreadList.date)
     up_next = qs.first()
 
