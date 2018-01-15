@@ -1,9 +1,10 @@
 import datetime
 import json
+import random
 import string
 
 from datetime import timedelta
-from random import shuffle, choice
+from random import choice
 
 from wtforms import StringField, validators
 from wtforms.fields import BooleanField, SubmitField
@@ -95,27 +96,49 @@ class GenerateBreadListForm(FlaskForm):
         db.session.add_all(self.new_breadlist)
         db.session.commit()
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, shuffle=False, **kwargs):
 
         def find_next_tuesday(date):
             to_add = timedelta(days=(0 - date.weekday()) % 7 + 1)
             return date + to_add
 
+        def find_next_new_tuesday(date):
+            r = find_next_tuesday(date)
+            while r in existing_future:
+                r = find_next_tuesday(r)
+            return r
+
         super().__init__(*args, **kwargs)
         people = db.session.query(Person).filter(Person.active ==  True).all()  # noqa
-        qs = db.session.query(BreadList)
-        qs = qs.order_by(BreadList.date.desc())
-        max_date = qs.first()
         today = datetime.date.today()
-        basis = max(max_date.date, today) if max_date else today
-        next_tuesday = find_next_tuesday(basis)
-        to_add = timedelta(days=7)
+
+        # Retrieve each person_id's most recent BreadList
+        # as well as existing future dates
+        qs = db.session.query(BreadList)
+        most_recent = {}
+        existing_future = []
+        for b in qs:
+            if most_recent.setdefault(b.person_id, b.date) < b.date:
+                most_recent[b.person_id] = b.date
+            if b.date >= today:
+                existing_future.append(b.date)
+        existing_future = set(existing_future)
+
+        # Put people never before in the list last,
+        # and order the rest by most recent bread date
+        people = sorted(
+            people, key=lambda p: (p.id not in most_recent, most_recent.get(p.id)))
+        next_tuesday = find_next_new_tuesday(today)
         self.new_bringers = []
-        shuffle(people)
+        if shuffle:
+            random.shuffle(people)
         for person in people:
+            if person.id in most_recent and most_recent[person.id] > b.date:
+                # Skip person who is already on the future list
+                continue
             self.new_bringers.append(dict(person=person, person_id=person.id,
                                           date=next_tuesday))
-            next_tuesday += to_add
+            next_tuesday = find_next_new_tuesday(next_tuesday)
         self.new_bringers = sorted(self.new_bringers, key=lambda p: p['date'],
                                    reverse=True)
         self.data.default = json.dumps(

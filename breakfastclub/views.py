@@ -41,7 +41,8 @@ def show_generate_breadlist():
     except ValueError:
         pass
     breadlist = breadlist[:5]
-    form = GenerateBreadListForm(request.form)
+    shuffle = bool(request.args.get('s'))
+    form = GenerateBreadListForm(request.form, shuffle=shuffle)
     if request.method == 'POST' and form.validate():
         form.save()
         flash('Generated breadlist saved.')
