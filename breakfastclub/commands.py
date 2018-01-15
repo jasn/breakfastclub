@@ -73,6 +73,9 @@ The Breakfastclub
     qs = qs.filter(BreadList.date < today+week)
     qs = qs.order_by(BreadList.date)
     up_next = qs.first()
+    if up_next is None:
+        print("No person to receive notification")
+        return
 
     qs = db.session.query(Person)
     qs = qs.filter(Person.active == True)  # noqa
