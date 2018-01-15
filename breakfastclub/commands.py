@@ -59,9 +59,9 @@ The Breakfastclub
 @click.option('-n', '--dry-run', is_flag=True)
 # 1 is tuesday, following python date.weekday()
 def send_mail_reminder(dry_run):
-    text_message = """Hello {name}.
-You are bringing breakfast on {date}.
-There are currently {count} people participating in the breakfastclub.
+    text_message = """Hi {name}
+
+It is your turn to bring breakfast on {date}.
 
 Best regards,
 The Breakfastclub
