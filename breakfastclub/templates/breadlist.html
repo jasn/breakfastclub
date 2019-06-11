@@ -1,7 +1,7 @@
 <table class="breakfastlist">
   <tr>
-    <th>Navn</th>
     <th>Dato</th>
+    <th>Navn</th>
   </tr>
   {% for breadbringer in breadbringers %}
   {% if breadbringer.is_next %}
@@ -9,8 +9,8 @@
     {% else %}
   <tr class="bringer">
   {% endif %}
-    <td>{{ breadbringer.person.name }}</td>
     <td>{{ breadbringer.date }}</td>
+    <td>{{ breadbringer.person.name }}</td>
   </tr>
   {% endfor %}
 </table>

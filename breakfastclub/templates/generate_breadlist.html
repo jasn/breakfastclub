@@ -10,13 +10,13 @@
   {{ form.data }}
 <table class="breakfastlist">
   <tr>
-    <th>Navn</th>
     <th>Dato</th>
+    <th>Navn</th>
   </tr>
   {% for bringer in form.new_bringers %}
   <tr>
-    <td>{{ bringer.person.name }}</td>
     <td>{{ bringer.date }}</td>
+    <td>{{ bringer.person.name }}</td>
   </tr>
   {% endfor %}
   <tr><td colspan=2><hr></td></tr>
@@ -26,8 +26,8 @@
     {% else %}
   <tr class="bringer">
   {% endif %}
-    <td>{{ breadbringer.person.name }}</td>
     <td>{{ breadbringer.date }}</td>
+    <td>{{ breadbringer.person.name }}</td>
   </tr>
   {% endfor %}
 </table>
