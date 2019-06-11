@@ -42,7 +42,7 @@ table.breakfastlist {
     width: 20%;
 }
 
-table.breakfastlist td:nth-child(2){
+table.breakfastlist td:nth-child(1){
     width: 90px;
 }
 
